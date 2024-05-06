@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.arbeitsweg = document.getElementById("arbeitsweg").value;
                 this.fahrzeug = document.getElementById("fahrzeug").value;
 
+                this.getCarInfo();
+
                 // Do whatever you need with the grabbed values
                 console.log("bruttogehalt:", this.bruttogehalt);
                 console.log("arbeitsstelle:", this.arbeitsstelle);
@@ -34,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log("kirchensteuer: ", this.kirchensteuer);
                 console.log("arbeitsweg: ", this.arbeitsweg);
                 console.log("fahrzeug: ", this.fahrzeug);
+                console.log("carPreis: ", this.carPreis);
+                console.log("carReichweite: ", this.carReichweite);
+                console.log("carMonatlicheRate: ", this.carMonatlicheRate);
             },
             getCarInfo() {
                 switch (this.fahrzeug) {
