@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 this.getCarInfo();
 
-                // Do whatever you need with the grabbed values
                 console.log("bruttogehalt:", this.bruttogehalt);
                 console.log("arbeitsstelle:", this.arbeitsstelle);
                 console.log("steuerklasse: ", this.steuerklasse);
