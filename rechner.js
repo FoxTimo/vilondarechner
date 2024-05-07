@@ -5,28 +5,33 @@ document.addEventListener('DOMContentLoaded', function () {
             bruttogehalt: null,
             arbeitsstelle: null,
             steuerklasse: null,
-            kinder: null,
+            zusatzbeitrag: null,
+            kinder: false,
             kinderfreibetraege: null,
             kirchensteuer: null,
             arbeitsweg: null,
+            stromzuschussAG: null,
             fahrzeug: null,
             carPreis: null,
             carReichweite: null,
             carMonatlicheRate: null,
+            abzuege: null,
         },
         methods: {
             grabValues() {
                 this.bruttogehalt = document.getElementById("bruttogehalt").value;
                 this.arbeitsstelle = document.getElementById("arbeitsstelle").value;
                 this.steuerklasse = document.getElementById("steuerklasse").value;
-                this.kinder = document.getElementById("kinder").value;
+                this.zusatzbeitrag = document.getElementById("zusatzbeitrag").value;
+                this.kinder = document.getElementById("kinder").checked;
                 this.kinderfreibetraege = document.getElementById("kinderfreibetraege").value;
                 this.kirchensteuer = document.getElementById("kirchensteuer").value;
                 this.arbeitsweg = document.getElementById("arbeitsweg").value;
                 this.fahrzeug = document.getElementById("fahrzeug").value;
+                this.stromzuschussAG = document.getElementById("stromzuschussAG").value;
 
                 this.getCarInfo();
-
+                
                 console.log("bruttogehalt:", this.bruttogehalt);
                 console.log("arbeitsstelle:", this.arbeitsstelle);
                 console.log("steuerklasse: ", this.steuerklasse);
@@ -38,6 +43,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log("carPreis: ", this.carPreis);
                 console.log("carReichweite: ", this.carReichweite);
                 console.log("carMonatlicheRate: ", this.carMonatlicheRate);
+                console.log("stromzuschussAG: ", this.stromzuschussAG);
+            },
+            berechneNetto() {
+                const grundfreibetrag = 10182;
+                let kinderfreibetrag = 0;
+          
+                let faktor = this.steuerklasse <= 2 ? 1 : 0.5;
+          
+                let zuVersteuerndesEinkommen = this.bruttogehalt * 12 - grundfreibetrag;
+                
+                if (this.kinder) {
+                    kinderfreibetrag = this.kinderfreibetraege * 0.5 * 235;
+                }
+          
+                let gesamtSteuer = (zuVersteuerndesEinkommen - kinderfreibetrag) * faktor;
+          
+                let steuer;
+                if (this.steuerklasse === 5 || this.steuerklasse === 6) {
+                  steuer = gesamtSteuer / 12;
+                } else {
+                  steuer = gesamtSteuer;
+                }
+          
+                const krankenkasse = this.bruttogehalt * this.zusatzbeitrag / 100;
+          
+                const kirchensteuerBetrag = this.bruttogehalt * this.kirchensteuer / 100;
+    
+                this.abzuege = steuer + krankenkasse + kirchensteuerBetrag;
+
+                return this.bruttogehalt - this.abzuege;
             },
             getCarInfo() {
                 switch (this.fahrzeug) {
@@ -259,7 +294,19 @@ document.addEventListener('DOMContentLoaded', function () {
             calculate() {
                 this.grabValues();
                 this.getCarInfo();
+                let nettoOhneVilonda = this.berechneNetto();
 
+                let vorteilKFZ = this.carPreis/100 * 0.25;
+                let vorteilArbeitsweg = vorteilKFZ * this.arbeitsweg * 0.03;
+                let vorteilMonat = vorteilKFZ + vorteilArbeitsweg;
+                let steuerpflichtigerLohnMitWagen = this.bruttogehalt - this.carMonatlicheRate - vorteilMonat;
+                let nettolohnMitVilonda = steuerpflichtigerLohnMitWagen - this.abzuege + this.stromzuschussAG;
+
+                let kostenArbeitnehmer = nettoOhneVilonda - nettolohnMitVilonda;
+
+                console.log("kostenArbeitnehmer: ", kostenArbeitnehmer);
+                return kostenArbeitnehmer;
+                
             }
         },
     });
